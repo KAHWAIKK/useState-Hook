@@ -1,45 +1,70 @@
 import { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa"
 
 const Content = () => {
-  const [ name, setName] = useState("Kahwai");
-  const [ count, setCount] = useState(2);
-    
-    const handleNameChange = () =>{
-    const names = ["Rob","Mark","Kevin"]
-    const int = Math.floor(Math.random() * 3);
-    setName(names[int])
-   }
+  const [ items, setItems] = useState([
+    {
+        id: 1,
+        checked: true,
+        item: "One half pound bag of Cocoa Covered Almonds Unsalted"
+    },
+    {
+        id: 2,
+        checked: false,
+        item: "Item 2"
+    },
+    {
+        id: 3,
+        checked: false,
+        item: "Item 3"
+    }
+]/* [21,12,12] */);
+//setItems(items);
  
-
- const handleClick = () =>{
-    setCount(count +1)
-     console.log(count)
-    //setCount(count +1)
-    
-    
-
+ const handleCheck = (id) => {
+  //console.log(`key : ${id}`);
+  const listItems = items.map((item) => item.id === id ? { ...item,checked : !item.checked} : item); 
+  setItems(listItems);
+  localStorage.setItem('shoppingList', JSON.stringify(listItems));
+ }   
+ const handleDelete = (id) => {
+  //console.log(`key : ${id}`);
+  const listItems = items.filter((item) => item.id !== id)
+  setItems(listItems);
+  localStorage.setItem('shoppingList', JSON.stringify(listItems));
  }
- /* passing a parameter in a click event */
- const handleClick2 = (name) =>{
-   console.log(` ${name} was clicked`)
- }
- /* Accessing the event object in the click event function */
- const handleClick3 = (e) =>{
-   console.log(e);//we get the event object with its keys and properties
-   console.log(e.target);//console returns the button element with its assocoated innertext
-   console.log(e.target.innerText);//console returns the innertext of the button element i.e Clicked
- }
- 
-
-  return (
-    <main>
-        <p onClick={handleClick}>Hello {name}!</p>
-        <button onClick={handleNameChange}>Change Name</button>
-        {/* passing a parameter in a click event */}
-        <button onClick={() =>handleClick2("Kahwai")}>Clicked</button>
-        <button onClick={(e) =>handleClick3(e)}>Clicked</button>
-    </main>
-  )
+   
+ return (
+  <main>
+    {items.length ?(
+      <ul>
+        {items.map((item) => (
+            <li className="item" key={item.id}>
+              <input 
+                type="checkbox"
+                onChange={() => handleCheck(item.id)}
+                checked = {item.checked} 
+              />
+              <label 
+                style={(item.checked) ? {'textDecoration': 'line-through'}: null}
+                onDoubleClick={() => handleCheck(item.id)}
+              >{item.item}
+              </label>
+              <FaTrashAlt
+                onClick={() => handleDelete(item.id)} 
+                role="button" 
+                tabIndex="0"
+              />
+            </li>))
+          }
+      </ul>
+    ): (
+      <p style={{marginTop : '2rem'}}>Your List is Empty</p>
+    )}
+    {/* <p style={{marginTop : '2rem'}}>Your List is Empty</p> */}
+      
+  </main>
+)
 }
 
 export default Content
