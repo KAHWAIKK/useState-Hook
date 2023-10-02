@@ -2,7 +2,7 @@ import React from 'react'
 import { FaPlus } from 'react-icons/fa'
 import { useRef } from 'react'
 
-const AddItem = ({newItem,setNewItem,handleSubmit}) => {
+const AddItems = ({newItem,setNewItem,handleSubmit}) => {
     const inputRef = useRef();
   return (
     <form className='addForm' onSubmit={handleSubmit}>
@@ -28,4 +28,4 @@ const AddItem = ({newItem,setNewItem,handleSubmit}) => {
   )
 }
 
-export default AddItem
+export default AddItems

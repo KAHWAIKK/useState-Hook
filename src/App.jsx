@@ -4,10 +4,10 @@ import viteLogo from '/vite.svg' */
 
 import Header from './Header';
 import SearchItem from './SearchItem';
-import AddItem from './AddItem';
+import AddItems from './AddItems';
 import Content from './Content';
 import Footer from './Footer';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 
 function App() {
@@ -31,35 +31,52 @@ function App() {
             item: "Item 3"
         }
       ] */
-      JSON.parse(localStorage.getItem('shoppingList'))
+       JSON.parse(localStorage.getItem('shoppingList')) || []
       /* [21,12,12] */
       );
       //setItems(items);
+
+      /* Avoiding default nature of useEffect using useEffect dependencies */
+
+      /* useEffect(() => {
+        console.log('load time')
+      },[]) */
+
+      /* When useEffect runs in the order of rendering */
+
+      /* console.log('before useEffect') */
+
+      useEffect(() => {
+        localStorage.setItem('shoppingList', JSON.stringify(items));
+      },[items])
+
+
+     /*  console.log('after useEffect') */
 
       const [newItem,setNewItem] = useState("")
       const [search,setSearch] = useState("")
 
       const setAandSaveItems = (newItems) => {
         setItems(newItems);
-        localStorage.setItem('shoppingList', JSON.stringify(newItems));
+       
       }
 
       const addItem = (item) => {
         const id = items.length ? items[items.length -1].id + 1 : 1;
         const myNewItem = { id, checked: false ,item}
         const listItems = [...items, myNewItem];
-        setAandSaveItems(listItems);
+        setItems(listItems);
       }
 
       const handleCheck = (id) => {
       //console.log(`key : ${id}`);
       const listItems = items.map((item) => item.id === id ? { ...item,checked : !item.checked} : item); 
-      setAandSaveItems(listItems);
+      setItems(listItems);
       }   
       const handleDelete = (id) => {
       //console.log(`key : ${id}`);
       const listItems = items.filter((item) => item.id !== id)
-      setAandSaveItems(listItems);;
+      setItems(listItems);;
       }
 
       const handleSubmit = (e) => {
@@ -79,7 +96,7 @@ function App() {
     <div className="App">
       <Header title="Groceries" />
       {/* PROPS DRILLING-passing down to the child component */}      
-      <AddItem
+      <AddItems
         newItem={newItem}
         setNewItem={setNewItem}
         handleSubmit={handleSubmit}
