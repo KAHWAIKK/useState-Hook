@@ -10,9 +10,11 @@ import Footer from './Footer';
 import { useState,useEffect } from 'react';
 
 
+
 function App() {
+    const API_URL = " http://localhost:3500/items"
  /*  const [count, setCount] = useState(0) */
-      const [ items, setItems] = useState(
+    const [ items, setItems] = useState(
         /* This was the default state */
       /*   [
         {
@@ -31,7 +33,7 @@ function App() {
             item: "Item 3"
         }
       ] */
-       JSON.parse(localStorage.getItem('shoppingList')) || []
+     /* JSON.parse(localStorage.getItem('shoppingList')) || */ []
       /* [21,12,12] */
       );
       //setItems(items);
@@ -46,20 +48,44 @@ function App() {
 
       /* console.log('before useEffect') */
 
-      useEffect(() => {
-        localStorage.setItem('shoppingList', JSON.stringify(items));
-      },[items])
+      const [newItem,setNewItem] = useState("")
+      const [search,setSearch] = useState("")
+      const [fetchError,setFetchError] = useState("")
+      const [isLoading,setIsLoading] = useState(true)
+
+
+    useEffect(() => {
+      //using useEffect with localStorage
+      /* localStorage.setItem('shoppingList', JSON.stringify(items)); */
+
+      //using useEffect with JSON server
+      const fetchItems = async () => {
+        try {
+          const response = await fetch(API_URL);
+          //console.log(response)
+          if(!response.ok) throw new Error("Did not receive expected data from server")
+          const listItems = await response.json();
+          console.log(listItems)
+          setItems(listItems);
+          setFetchError(null);
+        } catch (err) {
+          //console.log(err.message)
+          setFetchError(err.message)
+        } finally{
+          setIsLoading(false)
+        }
+      }
+      /* in the case the api takes sometim to respond,the user may get and empty list displayed, to avpid this we use the setTimeout fn */
+      setTimeout(() => {
+        fetchItems();
+      },2000);
+    },[])
 
 
      /*  console.log('after useEffect') */
 
-      const [newItem,setNewItem] = useState("")
-      const [search,setSearch] = useState("")
-
-      const setAandSaveItems = (newItems) => {
-        setItems(newItems);
+     
        
-      }
 
       const addItem = (item) => {
         const id = items.length ? items[items.length -1].id + 1 : 1;
@@ -105,11 +131,16 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
-      <Content 
-        items={items.filter(item => ((item.item).toUpperCase()).includes(search.toUpperCase()))}
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+      <main>
+        {isLoading && <p> Loading items...</p>}
+        {fetchError && <p style ={{ color: "red"}}>{`Error : ${fetchError}`} </p>}
+        {!fetchError && !isLoading &&
+            <Content 
+              items={items.filter(item => ((item.item).toUpperCase()).includes(search.toUpperCase()))}
+              handleCheck={handleCheck}
+              handleDelete={handleDelete}
+        />}
+      </main>
       <Footer 
         length={items.length}
       />
